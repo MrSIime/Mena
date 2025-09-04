@@ -37,20 +37,16 @@ matrix = [
 ]
 
 def get_coords(target: str):
-    if not target in matrix:
-        return None
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
             for k in range(len(matrix[i][j])):
                 if matrix[i][j][k] == target:
-                    coords = (i, j, k)
-                    return coords
-
+                    return (i, j, k)
+    return None
 
 def post_coords(target):
     try:
         i, j, k = target
-        sym = matrix[i][j][k]
-        return sym
-    except:
+        return matrix[i][j][k]
+    except Exception:
         return None

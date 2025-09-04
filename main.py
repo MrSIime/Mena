@@ -1,21 +1,10 @@
 import matrix
 import coder
-import numpy as np # type: ignore
+import numpy as np
 from PIL import Image
 
-#while True:
-#    i = input()
-#    if i == "p":
-#        target = (int(input()), int(input()), int(input()))
-#        print(matrix.post_coords(target))
-#    elif i == "g":
-#        target = str(input())
-#        print(matrix.get_coords(target))
-
 def open_image(path):
-        img = Image.open(path)
-        img.convert('RGB')
-        return img 
+    return Image.open(path).convert("RGB")
 
 def image_to_data(img):
     pix = np.array(img)
@@ -24,19 +13,27 @@ def image_to_data(img):
 def encode(text, path):
     data = []
     for char in text:
-         data.append(matrix.get_coords(char))
+        coords = matrix.get_coords(char)
+        if coords is not None:
+            data.append(coords)
+
     img = open_image(path)
     pix = image_to_data(img)
-    height, width = img.size    
-    colors = coder.encoder.encode(data, height, width, pix)
-    new_img = Image.new('RGB', (width*2, height*2))
+    width, height = img.size    
+
+    enc = coder.Encoder()
+    colors = enc.encode(data, height, width, iter(pix))
+
+    new_img = Image.new("RGB", (width*2, height*2))
     pixels = new_img.load()
+
     for y in range(height):
         for x in range(width):
-            pixels[x*2, y*2] = next(colors)
-            pixels[x*2+1, y*2] = next(colors)
-            pixels[x*2, y*2+1] = next(colors)
+            pixels[x*2,   y*2]   = next(colors)
+            pixels[x*2+1, y*2]   = next(colors)
+            pixels[x*2,   y*2+1] = next(colors)
             pixels[x*2+1, y*2+1] = next(colors)
-    new_img.save('encoded.png')
 
-encode(str(input()), str(input()))
+    new_img.save("encoded.png")
+
+encode(str(input("Текст: ")), str(input("Шлях до картинки: ")))
